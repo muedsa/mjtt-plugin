@@ -1,6 +1,6 @@
-package com.muedsa.tvbox.demoplugin.service
+package com.muedsa.tvbox.mjtt.service
 
-import com.muedsa.tvbox.demoplugin.TestPlugin
+import com.muedsa.tvbox.mjtt.TestPlugin
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
@@ -10,7 +10,8 @@ class MediaSearchServiceTest {
 
     @Test
     fun searchMedias_test() = runTest {
-        val row = service.searchMedias("GIRLS BAND CRY")
+        val media = TestPlugin.provideMainScreenService().getRowsData()[0].list[0]
+        val row = service.searchMedias(media.title)
         check(row.list.isNotEmpty())
         check(row.cardWidth > 0)
         check(row.cardHeight > 0)
@@ -18,6 +19,7 @@ class MediaSearchServiceTest {
             check(it.id.isNotEmpty())
             check(it.title.isNotEmpty())
             check(it.detailUrl.isNotEmpty())
+            println("${it.id} ${it.title} ${it.detailUrl} ${it.coverImageUrl}")
         }
     }
 }

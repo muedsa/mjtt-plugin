@@ -1,6 +1,6 @@
-package com.muedsa.tvbox.demoplugin.service
+package com.muedsa.tvbox.mjtt.service
 
-import com.muedsa.tvbox.demoplugin.TestPlugin
+import com.muedsa.tvbox.mjtt.TestPlugin
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
@@ -9,8 +9,9 @@ class MainScreenServiceTest {
     private val service = TestPlugin.provideMainScreenService()
 
     @Test
-    fun getRowsDataTest() = runTest{
+    fun getRowsDataTest() = runTest {
         val rows = service.getRowsData()
+        check(rows.isNotEmpty())
         rows.forEach { row ->
             check(row.title.isNotEmpty())
             check(row.list.isNotEmpty())
@@ -18,7 +19,10 @@ class MainScreenServiceTest {
             check(row.cardHeight > 0)
             println("${row.title} ${row.cardWidth}X${row.cardHeight} ${row.cardType}")
             row.list.forEach {
-                println("${it.title} ${it.id} ${it.detailUrl}")
+                check(it.id.isNotEmpty())
+                check(it.title.isNotEmpty())
+                check(it.detailUrl.isNotEmpty())
+                println("${it.title} ${it.id} ${it.detailUrl} ${it.coverImageUrl}")
             }
         }
     }

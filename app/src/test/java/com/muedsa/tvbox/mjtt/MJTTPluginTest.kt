@@ -1,8 +1,8 @@
-package com.muedsa.tvbox.demoplugin
+package com.muedsa.tvbox.mjtt
 
 import org.junit.Test
 
-class DemoPluginTest {
+class MJTTPluginTest {
 
     @Test
     fun create_test() {
