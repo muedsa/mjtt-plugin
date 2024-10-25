@@ -14,6 +14,9 @@ class MJTTPlugin(tvBoxContext: TvBoxContext) : IPlugin(tvBoxContext = tvBoxConte
 
     override var options: PluginOptions = PluginOptions(enableDanDanPlaySearch = false)
 
+    override suspend fun onInit() {}
+    override suspend fun onLaunched() {}
+
     private val mainScreenService by lazy { MainScreenService() }
     private val mediaDetailService by lazy { MediaDetailService() }
     private val mediaSearchService by lazy { MediaSearchService() }
