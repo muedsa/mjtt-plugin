@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PlaySourceInfo(
     @SerialName("Vod") val vod: List<String>,
-    @SerialName("Data") val data: Map<String, PlayUrlData>
+    @SerialName("Data") val data: List<PlayUrlData>
 )

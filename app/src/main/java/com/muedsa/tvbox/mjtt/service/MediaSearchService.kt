@@ -4,14 +4,17 @@ import com.muedsa.tvbox.api.data.MediaCardRow
 import com.muedsa.tvbox.api.service.IMediaSearchService
 import com.muedsa.tvbox.mjtt.CardHeight
 import com.muedsa.tvbox.mjtt.CardWidth
-import com.muedsa.tvbox.tool.ChromeUserAgent
+import com.muedsa.tvbox.tool.feignChrome
 import org.jsoup.Jsoup
+import java.net.CookieStore
 
-class MediaSearchService : IMediaSearchService {
+class MediaSearchService(
+    private val cookieStore: CookieStore
+) : IMediaSearchService {
 
     override suspend fun searchMedias(query: String): MediaCardRow {
         val body = Jsoup.connect("${MJTTService.getSiteUrl()}/vod-search.html")
-            .userAgent(ChromeUserAgent)
+            .feignChrome(cookieStore = cookieStore)
             .header("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
             .data("wd", query)
             .post()

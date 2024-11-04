@@ -8,6 +8,7 @@ import com.muedsa.tvbox.mjtt.CardWidth
 import com.muedsa.tvbox.mjtt.ColorCardHeight
 import com.muedsa.tvbox.mjtt.ColorCardWidth
 import com.muedsa.tvbox.mjtt.JumpUrlRegex
+import com.muedsa.tvbox.tool.feignChrome
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -31,6 +32,7 @@ object MJTTService {
         try {
             if (siteUrl == null) {
                 val doc = Jsoup.connect("http://mjtt.io")
+                    .feignChrome()
                     .get()
                 siteUrl = JumpUrlRegex.find(doc.html())!!.groups[1]!!.value.removeSuffix("/")
                 siteScheme = siteUrl!!.toHttpUrl().scheme

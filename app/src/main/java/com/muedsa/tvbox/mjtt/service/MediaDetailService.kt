@@ -17,16 +17,20 @@ import com.muedsa.tvbox.mjtt.model.PlaySourceInfo
 import com.muedsa.tvbox.mjtt.service.MJTTService.CARD_COLORS
 import com.muedsa.tvbox.tool.ChromeUserAgent
 import com.muedsa.tvbox.tool.LenientJson
+import com.muedsa.tvbox.tool.feignChrome
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import timber.log.Timber
+import java.net.CookieStore
 
-class MediaDetailService : IMediaDetailService {
+class MediaDetailService(
+    private val cookieStore: CookieStore
+) : IMediaDetailService {
 
     override suspend fun getDetailData(mediaId: String, detailUrl: String): MediaDetail {
         val url = "${MJTTService.getSiteUrl()}$detailUrl"
         val body = Jsoup.connect(url)
-            .userAgent(ChromeUserAgent)
+            .feignChrome(cookieStore = cookieStore)
             .get()
             .body()
         val rowEl = body.selectFirst(".container:nth-child(2)")!!
@@ -139,14 +143,14 @@ class MediaDetailService : IMediaDetailService {
     ): MediaHttpSource {
         val pageUrl = "${MJTTService.getSiteUrl()}${episode.id}"
         val body = Jsoup.connect(pageUrl)
-            .userAgent(ChromeUserAgent)
+            .feignChrome(cookieStore = cookieStore)
             .get()
             .body()
         val scriptEl = body.selectFirst(".container .row .z-paly script:nth-child(1)")!!
         val infoJson = FF_URLS_REGEX.find(scriptEl.html())!!.groups[1]!!.value
         val info = LenientJson.decodeFromString<PlaySourceInfo>(infoJson)
         var data: List<String>? = null
-        val source = info.data.values.find { source ->
+        val source = info.data.find { source ->
             data = source.playUrls.find { urlData -> urlData[2] == episode.id }
             data != null
         }
@@ -170,7 +174,7 @@ class MediaDetailService : IMediaDetailService {
 
     private fun getHuoboMediaHttpSource(key: String): MediaHttpSource {
         val body = Jsoup.connect("https://php.playerla.com/mjplay/?id=$key")
-            .userAgent(ChromeUserAgent)
+            .feignChrome(cookieStore = cookieStore)
             .get()
             .body()
         return MediaHttpSource(
