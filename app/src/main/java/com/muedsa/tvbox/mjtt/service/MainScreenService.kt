@@ -2,20 +2,25 @@ package com.muedsa.tvbox.mjtt.service
 
 import com.muedsa.tvbox.api.data.MediaCardRow
 import com.muedsa.tvbox.api.service.IMainScreenService
+import com.muedsa.tvbox.tool.checkSuccess
 import com.muedsa.tvbox.tool.feignChrome
-import org.jsoup.Jsoup
+import com.muedsa.tvbox.tool.get
+import com.muedsa.tvbox.tool.parseHtml
+import com.muedsa.tvbox.tool.toRequestBuild
+import okhttp3.OkHttpClient
 import timber.log.Timber
-import java.net.CookieStore
 
 class MainScreenService(
-    private val cookieStore: CookieStore
+    private val mjttService: MJTTService,
+    private val okHttpClient: OkHttpClient,
 ) : IMainScreenService {
 
     override suspend fun getRowsData(): List<MediaCardRow> {
-        val url = "${MJTTService.getSiteUrl()}/"
-        val doc = Jsoup.connect(url)
-            .feignChrome(cookieStore = cookieStore)
-            .get()
+        val doc = "${mjttService.getSiteUrl()}/".toRequestBuild()
+            .feignChrome()
+            .get(okHttpClient = okHttpClient)
+            .checkSuccess()
+            .parseHtml()
         val panelEls = doc.body().select(".container .row .z-pannel")
         val rows = mutableListOf<MediaCardRow>()
         panelEls.forEachIndexed { panelIndex, panelEl ->

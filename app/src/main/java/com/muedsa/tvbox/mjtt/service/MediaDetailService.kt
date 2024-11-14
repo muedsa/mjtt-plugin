@@ -9,29 +9,34 @@ import com.muedsa.tvbox.api.data.MediaHttpSource
 import com.muedsa.tvbox.api.data.MediaPlaySource
 import com.muedsa.tvbox.api.data.SavedMediaCard
 import com.muedsa.tvbox.api.service.IMediaDetailService
+import com.muedsa.tvbox.mjtt.CARD_COLORS
 import com.muedsa.tvbox.mjtt.CardHeight
 import com.muedsa.tvbox.mjtt.CardWidth
 import com.muedsa.tvbox.mjtt.ColorCardHeight
 import com.muedsa.tvbox.mjtt.ColorCardWidth
 import com.muedsa.tvbox.mjtt.model.PlaySourceInfo
-import com.muedsa.tvbox.mjtt.service.MJTTService.CARD_COLORS
 import com.muedsa.tvbox.tool.ChromeUserAgent
 import com.muedsa.tvbox.tool.LenientJson
+import com.muedsa.tvbox.tool.checkSuccess
 import com.muedsa.tvbox.tool.feignChrome
-import org.jsoup.Jsoup
+import com.muedsa.tvbox.tool.get
+import com.muedsa.tvbox.tool.parseHtml
+import com.muedsa.tvbox.tool.toRequestBuild
+import okhttp3.OkHttpClient
 import org.jsoup.nodes.Element
 import timber.log.Timber
-import java.net.CookieStore
 
 class MediaDetailService(
-    private val cookieStore: CookieStore
+    private val mjttService: MJTTService,
+    private val okHttpClient: OkHttpClient,
 ) : IMediaDetailService {
 
     override suspend fun getDetailData(mediaId: String, detailUrl: String): MediaDetail {
-        val url = "${MJTTService.getSiteUrl()}$detailUrl"
-        val body = Jsoup.connect(url)
-            .feignChrome(cookieStore = cookieStore)
-            .get()
+        val body = "${mjttService.getSiteUrl()}$detailUrl".toRequestBuild()
+            .feignChrome()
+            .get(okHttpClient = okHttpClient)
+            .checkSuccess()
+            .parseHtml()
             .body()
         val rowEl = body.selectFirst(".container:nth-child(2)")!!
             .selectFirst(".row")!!
@@ -40,7 +45,7 @@ class MediaDetailService(
         val picEl = vodEl.selectFirst(".z-list_pic")!!
         val detailPath = picEl.attr("href")
         val title = vodEl.selectFirst("h1")!!.text().trim()
-        val imageUrl = MJTTService.resolveUrl(picEl.attr("data-original"))
+        val imageUrl = picEl.absUrl("data-original")
         val ulEl = vodEl.selectFirst("ul")!!
         val liEls = ulEl.select("li")
         val descArr = mutableListOf<String>()
@@ -141,10 +146,12 @@ class MediaDetailService(
         playSource: MediaPlaySource,
         episode: MediaEpisode
     ): MediaHttpSource {
-        val pageUrl = "${MJTTService.getSiteUrl()}${episode.id}"
-        val body = Jsoup.connect(pageUrl)
-            .feignChrome(cookieStore = cookieStore)
-            .get()
+        val pageUrl = "${mjttService.getSiteUrl()}${episode.id}"
+        val body = pageUrl.toRequestBuild()
+            .feignChrome()
+            .get(okHttpClient = okHttpClient)
+            .checkSuccess()
+            .parseHtml()
             .body()
         val scriptEl = body.selectFirst(".container .row .z-paly script:nth-child(1)")!!
         val infoJson = FF_URLS_REGEX.find(scriptEl.html())!!.groups[1]!!.value
@@ -162,7 +169,7 @@ class MediaDetailService(
                 url = playUrl,
                 httpHeaders = mapOf(
                     "User-Agent" to ChromeUserAgent,
-                    "Referer" to "${MJTTService.getSiteUrl()}/"
+                    "Referer" to "${mjttService.getSiteUrl()}/"
                 )
             )
         } else if (source.playName.startsWith("huobo")) {
@@ -173,9 +180,11 @@ class MediaDetailService(
     }
 
     private fun getHuoboMediaHttpSource(key: String): MediaHttpSource {
-        val body = Jsoup.connect("https://php.playerla.com/mjplay/?id=$key")
-            .feignChrome(cookieStore = cookieStore)
-            .get()
+        val body = "https://php.playerla.com/mjplay/?id=$key".toRequestBuild()
+            .feignChrome()
+            .get(okHttpClient = okHttpClient)
+            .checkSuccess()
+            .parseHtml()
             .body()
         return MediaHttpSource(
             url = CURRENT_URL_REGEX.find(body.html())!!.groups[1]!!.value,

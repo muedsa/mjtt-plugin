@@ -4,20 +4,30 @@ import com.muedsa.tvbox.api.data.MediaCardRow
 import com.muedsa.tvbox.api.service.IMediaSearchService
 import com.muedsa.tvbox.mjtt.CardHeight
 import com.muedsa.tvbox.mjtt.CardWidth
+import com.muedsa.tvbox.tool.checkSuccess
 import com.muedsa.tvbox.tool.feignChrome
-import org.jsoup.Jsoup
-import java.net.CookieStore
+import com.muedsa.tvbox.tool.parseHtml
+import com.muedsa.tvbox.tool.post
+import com.muedsa.tvbox.tool.toRequestBuild
+import okhttp3.FormBody
+import okhttp3.OkHttpClient
 
 class MediaSearchService(
-    private val cookieStore: CookieStore
+    private val mjttService: MJTTService,
+    private val okHttpClient: OkHttpClient
 ) : IMediaSearchService {
 
     override suspend fun searchMedias(query: String): MediaCardRow {
-        val body = Jsoup.connect("${MJTTService.getSiteUrl()}/vod-search.html")
-            .feignChrome(cookieStore = cookieStore)
-            .header("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
-            .data("wd", query)
-            .post()
+        val body = "${mjttService.getSiteUrl()}/vod-search.html".toRequestBuild()
+            .feignChrome()
+            .post(
+                body = FormBody.Builder()
+                    .add("wd", query)
+                    .build(),
+                okHttpClient = okHttpClient
+            )
+            .checkSuccess()
+            .parseHtml()
             .body()
         val ulEl = body.selectFirst(".container .row .z-pannel .z-pannel_bd .z-list")!!
         val rows = mutableListOf<MediaCardRow>()
