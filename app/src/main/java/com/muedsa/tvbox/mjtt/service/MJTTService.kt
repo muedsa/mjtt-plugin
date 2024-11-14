@@ -9,10 +9,13 @@ import com.muedsa.tvbox.mjtt.CardWidth
 import com.muedsa.tvbox.mjtt.ColorCardHeight
 import com.muedsa.tvbox.mjtt.ColorCardWidth
 import com.muedsa.tvbox.mjtt.JumpUrlRegex
+import com.muedsa.tvbox.tool.checkSuccess
 import com.muedsa.tvbox.tool.feignChrome
+import com.muedsa.tvbox.tool.get
+import com.muedsa.tvbox.tool.parseHtml
+import com.muedsa.tvbox.tool.toRequestBuild
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
-import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import timber.log.Timber
@@ -27,9 +30,11 @@ class MJTTService(
     fun getSiteUrl(): String {
         try {
             if (siteUrl == null) {
-                val doc = Jsoup.connect("http://mjtt.io")
+                val doc = "http://mjtt.io".toRequestBuild()
                     .feignChrome()
-                    .get()
+                    .get(okHttpClient = okHttpClient)
+                    .checkSuccess()
+                    .parseHtml()
                 siteUrl = JumpUrlRegex.find(doc.html())!!.groups[1]!!.value.removeSuffix("/")
                 siteScheme = siteUrl!!.toHttpUrl().scheme
             }
@@ -37,18 +42,6 @@ class MJTTService(
             throw RuntimeException("获取站点URL失败", throwable)
         }
         return siteUrl!!
-    }
-
-    fun resolveUrl(url: String): String {
-        return if (url.isBlank() || url.startsWith("http://") || url.startsWith("https://")) {
-            url
-        } else if (url.startsWith("//:")) {
-            "$siteScheme$url"
-        } else if (url.startsWith("/")){
-            "$siteUrl$url"
-        } else {
-            "$siteUrl/$url"
-        }
     }
 
     companion object {
@@ -144,6 +137,4 @@ class MJTTService(
             )
         }
     }
-
-
 }
