@@ -9,7 +9,7 @@ import com.muedsa.tvbox.api.data.MediaHttpSource
 import com.muedsa.tvbox.api.data.MediaPlaySource
 import com.muedsa.tvbox.api.data.SavedMediaCard
 import com.muedsa.tvbox.api.service.IMediaDetailService
-import com.muedsa.tvbox.mjtt.CARD_COLORS
+import com.muedsa.tvbox.mjtt.CardColors
 import com.muedsa.tvbox.mjtt.CardHeight
 import com.muedsa.tvbox.mjtt.CardWidth
 import com.muedsa.tvbox.mjtt.ColorCardHeight
@@ -134,7 +134,7 @@ class MediaDetailService(
                         id = href,
                         title = aEl.text().trim(),
                         detailUrl = href,
-                        backgroundColor = CARD_COLORS[index % CARD_COLORS.size],
+                        backgroundColor = CardColors[index % CardColors.size],
                     )
                 },
                 cardType = MediaCardType.NOT_IMAGE

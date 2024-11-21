@@ -3,7 +3,7 @@ package com.muedsa.tvbox.mjtt.service
 import com.muedsa.tvbox.api.data.MediaCard
 import com.muedsa.tvbox.api.data.MediaCardRow
 import com.muedsa.tvbox.api.data.MediaCardType
-import com.muedsa.tvbox.mjtt.CARD_COLORS
+import com.muedsa.tvbox.mjtt.CardColors
 import com.muedsa.tvbox.mjtt.CardHeight
 import com.muedsa.tvbox.mjtt.CardWidth
 import com.muedsa.tvbox.mjtt.ColorCardHeight
@@ -96,7 +96,7 @@ class MJTTService(
                 id = aEl.attr("href"),
                 title = aEl.text().trim(),
                 detailUrl = aEl.attr("href"),
-                backgroundColor = CARD_COLORS[(index + rowIndex) % CARD_COLORS.size],
+                backgroundColor = CardColors[(index + rowIndex) % CardColors.size],
                 subTitle = spanEl.text().trim()
             )
         }
@@ -133,7 +133,7 @@ class MJTTService(
                 id = aEl.attr("href"),
                 title = aEl.attr("title"),
                 detailUrl = aEl.attr("href"),
-                backgroundColor = CARD_COLORS[(index + rowIndex) % CARD_COLORS.size]
+                backgroundColor = CardColors[(index + rowIndex) % CardColors.size]
             )
         }
     }

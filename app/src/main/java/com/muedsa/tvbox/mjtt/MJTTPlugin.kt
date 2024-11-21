@@ -4,10 +4,12 @@ import com.muedsa.tvbox.api.plugin.IPlugin
 import com.muedsa.tvbox.api.plugin.PluginOptions
 import com.muedsa.tvbox.api.plugin.TvBoxContext
 import com.muedsa.tvbox.api.service.IMainScreenService
+import com.muedsa.tvbox.api.service.IMediaCatalogService
 import com.muedsa.tvbox.api.service.IMediaDetailService
 import com.muedsa.tvbox.api.service.IMediaSearchService
 import com.muedsa.tvbox.mjtt.service.MJTTService
 import com.muedsa.tvbox.mjtt.service.MainScreenService
+import com.muedsa.tvbox.mjtt.service.MediaCatalogService
 import com.muedsa.tvbox.mjtt.service.MediaDetailService
 import com.muedsa.tvbox.mjtt.service.MediaSearchService
 import com.muedsa.tvbox.tool.IPv6Checker
@@ -52,10 +54,18 @@ class MJTTPlugin(tvBoxContext: TvBoxContext) : IPlugin(tvBoxContext = tvBoxConte
             okHttpClient = okHttpClient,
         )
     }
+    private val mediaCatalogService by lazy {
+        MediaCatalogService(
+            mjttService = mtjjService,
+            okHttpClient = okHttpClient,
+        )
+    }
 
     override fun provideMainScreenService(): IMainScreenService = mainScreenService
 
     override fun provideMediaDetailService(): IMediaDetailService = mediaDetailService
 
     override fun provideMediaSearchService(): IMediaSearchService = mediaSearchService
+
+    override fun provideMediaCatalogService(): IMediaCatalogService = mediaCatalogService
 }
