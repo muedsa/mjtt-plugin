@@ -5,8 +5,8 @@ import com.muedsa.tvbox.api.data.MediaCatalogOptionItem
 import java.util.Calendar
 
 val JumpUrlRegex = "window.location.href\\s*=\\s*\"(.*?)\"".toRegex()
-const val CardWidth = 171
-const val CardHeight = 240
+const val CardWidth = 132
+const val CardHeight = 160
 const val ColorCardWidth = 240
 const val ColorCardHeight = 85
 val CardColors = listOf(
