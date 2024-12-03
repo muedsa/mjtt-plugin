@@ -1,5 +1,7 @@
 package com.muedsa.tvbox.mjtt.service
 
+import com.muedsa.tvbox.api.data.DanmakuData
+import com.muedsa.tvbox.api.data.DanmakuDataFlow
 import com.muedsa.tvbox.api.data.MediaCard
 import com.muedsa.tvbox.api.data.MediaCardRow
 import com.muedsa.tvbox.api.data.MediaCardType
@@ -194,6 +196,11 @@ class MediaDetailService(
             )
         )
     }
+
+    override suspend fun getEpisodeDanmakuDataList(episode: MediaEpisode): List<DanmakuData> =
+        emptyList()
+
+    override suspend fun getEpisodeDanmakuDataFlow(episode: MediaEpisode): DanmakuDataFlow? = null
 
     companion object {
         val FF_URLS_REGEX = "var ff_urls='(\\{.*?\\})';".toRegex()
