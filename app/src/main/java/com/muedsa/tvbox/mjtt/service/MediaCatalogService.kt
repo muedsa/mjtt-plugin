@@ -42,7 +42,7 @@ class MediaCatalogService(
         val year = options.findOptionFirstValue("year", defaultValue = "")
         val order = options.findOptionFirstValue("order", defaultValue = "")
         val url =
-            "https://www.mjtt5.net/$category/index_${page}_${genre}__${year}__${order}_${region}_1.html"
+            "${mjttService.getSiteUrl()}/$category/index_${page}_${genre}__${year}__${order}_${region}_1.html"
         val body = url.toRequestBuild()
             .feignChrome()
             .get(okHttpClient = okHttpClient)
