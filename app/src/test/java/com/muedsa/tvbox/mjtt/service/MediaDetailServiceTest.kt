@@ -1,13 +1,20 @@
 package com.muedsa.tvbox.mjtt.service
 
 import com.muedsa.tvbox.api.data.MediaCardType
+import com.muedsa.tvbox.mjtt.TestMJTTService
+import com.muedsa.tvbox.mjtt.TestOkHttpClient
 import com.muedsa.tvbox.mjtt.TestPlugin
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class MediaDetailServiceTest {
 
-    private val service = TestPlugin.provideMediaDetailService()
+    private val service by lazy {
+        MediaDetailService(
+            mjttService = TestMJTTService,
+            okHttpClient = TestOkHttpClient,
+        )
+    }
 
     @Test
     fun getDetailData_test() = runTest {
@@ -69,12 +76,11 @@ class MediaDetailServiceTest {
 
     @Test
     fun getEpisodePlayInfo_test() = runTest {
-        val media = TestPlugin.provideMainScreenService().getRowsData()[0].list[0]
-        val detail = service.getDetailData(media.id, media.detailUrl)
+        val detail = service.getDetailData("/mhkh/jiarudierji/","/mhkh/jiarudierji/")
         check(detail.playSourceList.isNotEmpty())
         check(detail.playSourceList.flatMap { it.episodeList }.isNotEmpty())
         val mediaPlaySource = detail.playSourceList[0]
-        val mediaEpisode = mediaPlaySource.episodeList[0]
+        val mediaEpisode = mediaPlaySource.episodeList[6]
         val playInfo = service.getEpisodePlayInfo(mediaPlaySource, mediaEpisode)
         check(playInfo.url.isNotEmpty())
         println(playInfo.url)

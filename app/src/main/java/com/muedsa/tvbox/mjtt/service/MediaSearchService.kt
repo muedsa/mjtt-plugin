@@ -32,7 +32,7 @@ class MediaSearchService(
         val ulEl = body.selectFirst(".container .row .z-pannel .z-pannel_bd .z-list")!!
         val rows = mutableListOf<MediaCardRow>()
         MJTTService.appendRowWithUl(rows = rows, rowTitle = "search list", ulEl = ulEl)
-        return if (rows.size > 0) rows[0] else MediaCardRow(
+        return if (rows.isNotEmpty()) rows[0] else MediaCardRow(
             title = "search list",
             cardWidth = CardWidth,
             cardHeight = CardHeight,

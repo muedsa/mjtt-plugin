@@ -16,7 +16,7 @@ import com.muedsa.tvbox.mjtt.CardHeight
 import com.muedsa.tvbox.mjtt.CardWidth
 import com.muedsa.tvbox.mjtt.ColorCardHeight
 import com.muedsa.tvbox.mjtt.ColorCardWidth
-import com.muedsa.tvbox.mjtt.model.PlaySourceInfo
+import com.muedsa.tvbox.mjtt.model.PlayUrlData
 import com.muedsa.tvbox.tool.ChromeUserAgent
 import com.muedsa.tvbox.tool.LenientJson
 import com.muedsa.tvbox.tool.checkSuccess
@@ -24,6 +24,11 @@ import com.muedsa.tvbox.tool.feignChrome
 import com.muedsa.tvbox.tool.get
 import com.muedsa.tvbox.tool.parseHtml
 import com.muedsa.tvbox.tool.toRequestBuild
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.jsonObject
 import okhttp3.OkHttpClient
 import org.jsoup.nodes.Element
 import timber.log.Timber
@@ -157,11 +162,32 @@ class MediaDetailService(
             .body()
         val scriptEl = body.selectFirst(".container .row .z-paly script:nth-child(1)")!!
         val infoJson = FF_URLS_REGEX.find(scriptEl.html())!!.groups[1]!!.value
-        val info = LenientJson.decodeFromString<PlaySourceInfo>(infoJson)
+        Timber.i("ff_urls=$infoJson")
+        var infoJsonElement = LenientJson.parseToJsonElement(infoJson)
+        val infoDataJsonElement = infoJsonElement.jsonObject["Data"]
+        check(infoDataJsonElement != null && infoDataJsonElement !is JsonNull) { "解析播放源失败" }
+        var source: PlayUrlData? = null
         var data: List<String>? = null
-        val source = info.data.find { source ->
-            data = source.playUrls.find { urlData -> urlData[2] == episode.id }
-            data != null
+        if (infoDataJsonElement is JsonArray) {
+            val infoDataList =
+                LenientJson.decodeFromJsonElement<List<PlayUrlData>>(infoDataJsonElement)
+            for (s in infoDataList) {
+                data = s.playUrls.find { urlData -> urlData[2] == episode.id }
+                if (data != null) {
+                    source = s
+                    break
+                }
+            }
+        } else if (infoDataJsonElement is JsonObject) {
+            val infoDataMap =
+                LenientJson.decodeFromJsonElement<Map<String, PlayUrlData>>(infoDataJsonElement)
+            for ((_, v) in infoDataMap) {
+                data = v.playUrls.find { urlData -> urlData[2] == episode.id }
+                if (data != null) {
+                    source = v
+                    break
+                }
+            }
         }
         val playUrl: String = data?.get(1) ?: ""
         checkNotNull(source) { "播放源未找到" }
