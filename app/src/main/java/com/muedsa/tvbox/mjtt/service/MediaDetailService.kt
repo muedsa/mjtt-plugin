@@ -192,24 +192,25 @@ class MediaDetailService(
         val playUrl: String = data?.get(1) ?: ""
         checkNotNull(source) { "播放源未找到" }
         check(playUrl.isNotBlank()) { "播放源未找到" }
+        val referer = "${mjttService.getSiteUrl()}/"
         if (playUrl.endsWith(".m3u8", true)) {
             return MediaHttpSource(
                 url = playUrl,
                 httpHeaders = mapOf(
                     "User-Agent" to ChromeUserAgent,
-                    "Referer" to "${mjttService.getSiteUrl()}/"
+                    "Referer" to referer
                 )
             )
         } else if (source.playName.startsWith("huobo")) {
-            return getHuoboMediaHttpSource(playUrl)
+            return getHuoboMediaHttpSource(key = playUrl, referer = referer)
         } else {
             throw RuntimeException("不支持的播放源")
         }
     }
 
-    private fun getHuoboMediaHttpSource(key: String): MediaHttpSource {
+    private fun getHuoboMediaHttpSource(key: String, referer: String): MediaHttpSource {
         val body = "https://php.playerla.com/mjplay/?id=$key".toRequestBuild()
-            .feignChrome()
+            .feignChrome(referer = referer)
             .get(okHttpClient = okHttpClient)
             .checkSuccess()
             .parseHtml()
