@@ -163,7 +163,7 @@ class MediaDetailService(
         val scriptEl = body.selectFirst(".container .row .z-paly script:nth-child(1)")!!
         val infoJson = FF_URLS_REGEX.find(scriptEl.html())!!.groups[1]!!.value
         Timber.i("ff_urls=$infoJson")
-        var infoJsonElement = LenientJson.parseToJsonElement(infoJson)
+        val infoJsonElement = LenientJson.parseToJsonElement(infoJson)
         val infoDataJsonElement = infoJsonElement.jsonObject["Data"]
         check(infoDataJsonElement != null && infoDataJsonElement !is JsonNull) { "解析播放源失败" }
         var source: PlayUrlData? = null
@@ -193,8 +193,8 @@ class MediaDetailService(
         checkNotNull(source) { "播放源未找到" }
         check(playUrl.isNotBlank()) { "播放源未找到" }
         val referer = "${mjttService.getSiteUrl()}/"
-        if (playUrl.endsWith(".m3u8", true)) {
-            return MediaHttpSource(
+        return if (playUrl.endsWith(".m3u8", true)) {
+            MediaHttpSource(
                 url = playUrl,
                 httpHeaders = mapOf(
                     "User-Agent" to ChromeUserAgent,
@@ -202,7 +202,7 @@ class MediaDetailService(
                 )
             )
         } else if (source.playName.startsWith("huobo")) {
-            return getHuoboMediaHttpSource(key = playUrl, referer = referer)
+            getHuoboMediaHttpSource(key = playUrl, referer = referer)
         } else {
             throw RuntimeException("不支持的播放源")
         }
