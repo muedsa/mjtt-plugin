@@ -19,12 +19,12 @@ if (keystorePropertiesFile.exists() && keystorePropertiesFile.canRead()) {
 
 android {
     namespace = "com.muedsa.tvbox.mtjj"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.muedsa.tvbox.mtjj"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 15
         versionName = "0.1.3"
     }
