@@ -3,7 +3,12 @@ package com.muedsa.tvbox.mjtt.service
 import com.muedsa.tvbox.tool.IPv6Checker
 import com.muedsa.tvbox.tool.createOkHttpClient
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [28])
 class MJTTServiceTest {
 
     private val okHttpClient = createOkHttpClient(

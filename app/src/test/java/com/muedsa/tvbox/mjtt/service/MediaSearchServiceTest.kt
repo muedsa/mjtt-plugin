@@ -3,7 +3,12 @@ package com.muedsa.tvbox.mjtt.service
 import com.muedsa.tvbox.mjtt.TestPlugin
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [28])
 class MediaSearchServiceTest {
 
     private val service = TestPlugin.provideMediaSearchService()
