@@ -1,6 +1,7 @@
 package com.muedsa.tvbox.mjtt.service
 
-import com.muedsa.tvbox.mjtt.TestPlugin
+import com.muedsa.tvbox.mjtt.TestMJTTService
+import com.muedsa.tvbox.mjtt.TestOkHttpClient
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -11,11 +12,23 @@ import org.robolectric.annotation.Config
 @Config(sdk = [28])
 class MediaSearchServiceTest {
 
-    private val service = TestPlugin.provideMediaSearchService()
+    private val mainScreenService by lazy {
+        MainScreenService(
+            mjttService = TestMJTTService,
+            okHttpClient = TestOkHttpClient,
+        )
+    }
+
+    private val service by lazy {
+        MediaSearchService(
+            mjttService = TestMJTTService,
+            okHttpClient = TestOkHttpClient,
+        )
+    }
 
     @Test
     fun searchMedias_test() = runTest {
-        val media = TestPlugin.provideMainScreenService().getRowsData()[0].list[0]
+        val media = mainScreenService.getRowsData()[0].list[0]
         val row = service.searchMedias(media.title)
         check(row.list.isNotEmpty())
         check(row.cardWidth > 0)

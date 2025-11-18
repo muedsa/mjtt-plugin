@@ -3,7 +3,6 @@ package com.muedsa.tvbox.mjtt.service
 import com.muedsa.tvbox.api.data.MediaCardType
 import com.muedsa.tvbox.mjtt.TestMJTTService
 import com.muedsa.tvbox.mjtt.TestOkHttpClient
-import com.muedsa.tvbox.mjtt.TestPlugin
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -14,6 +13,13 @@ import org.robolectric.annotation.Config
 @Config(sdk = [28])
 class MediaDetailServiceTest {
 
+    private val mainScreenService by lazy {
+        MainScreenService(
+            mjttService = TestMJTTService,
+            okHttpClient = TestOkHttpClient,
+        )
+    }
+
     private val service by lazy {
         MediaDetailService(
             mjttService = TestMJTTService,
@@ -23,7 +29,7 @@ class MediaDetailServiceTest {
 
     @Test
     fun getDetailData_test() = runTest {
-        val media = TestPlugin.provideMainScreenService().getRowsData()[0].list[0]
+        val media = mainScreenService.getRowsData()[0].list[0]
         val detail = service.getDetailData(media.id, media.detailUrl)
         check(detail.id.isNotEmpty())
         println(detail.id)
@@ -81,11 +87,12 @@ class MediaDetailServiceTest {
 
     @Test
     fun getEpisodePlayInfo_test() = runTest {
-        val detail = service.getDetailData("/mhkh/jiarudierji/","/mhkh/jiarudierji/")
+        val media = mainScreenService.getRowsData()[0].list[0]
+        val detail = service.getDetailData(media.id, media.detailUrl)
         check(detail.playSourceList.isNotEmpty())
         check(detail.playSourceList.flatMap { it.episodeList }.isNotEmpty())
         val mediaPlaySource = detail.playSourceList[0]
-        val mediaEpisode = mediaPlaySource.episodeList[6]
+        val mediaEpisode = mediaPlaySource.episodeList[0]
         val playInfo = service.getEpisodePlayInfo(mediaPlaySource, mediaEpisode)
         check(playInfo.url.isNotEmpty())
         println(playInfo.url)

@@ -1,6 +1,7 @@
 package com.muedsa.tvbox.mjtt.service
 
-import com.muedsa.tvbox.mjtt.TestPlugin
+import com.muedsa.tvbox.mjtt.TestMJTTService
+import com.muedsa.tvbox.mjtt.TestOkHttpClient
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -11,7 +12,12 @@ import org.robolectric.annotation.Config
 @Config(sdk = [28])
 class MainScreenServiceTest {
 
-    private val service = TestPlugin.provideMainScreenService()
+    private val service by lazy {
+        MainScreenService(
+            mjttService = TestMJTTService,
+            okHttpClient = TestOkHttpClient,
+        )
+    }
 
     @Test
     fun getRowsDataTest() = runTest {

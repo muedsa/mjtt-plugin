@@ -2,7 +2,8 @@ package com.muedsa.tvbox.mjtt.service
 
 
 import com.muedsa.tvbox.api.data.MediaCatalogOption
-import com.muedsa.tvbox.mjtt.TestPlugin
+import com.muedsa.tvbox.mjtt.TestMJTTService
+import com.muedsa.tvbox.mjtt.TestOkHttpClient
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -13,7 +14,12 @@ import org.robolectric.annotation.Config
 @Config(sdk = [28])
 class MediaCatalogServiceTest {
 
-    private val service = TestPlugin.provideMediaCatalogService()
+    private val service by lazy {
+        MediaCatalogService(
+            mjttService = TestMJTTService,
+            okHttpClient = TestOkHttpClient,
+        )
+    }
 
     @Test
     fun getConfig_test() = runTest {
